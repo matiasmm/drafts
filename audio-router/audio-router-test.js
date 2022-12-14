@@ -2,11 +2,12 @@ var portAudio = require('naudiodon');
 var fs = require('fs');
 
 const DEV_AIRPODS = 'AirPods Max de Matias'
+const DEV_BLACKHOLE = 'BlackHole 2ch'
 const DEV_VB_CABLE = 'VB-Cable'
 const DEV_SPEAKERS = 'MacBook Pro Speakers'
 const DEV_MIC_MAC = 'MacBook Pro Microphone'
 
-const INPUT_DEVICE_NAME = DEV_VB_CABLE
+const INPUT_DEVICE_NAME = DEV_BLACKHOLE
 const OUTPUT_DEVICE_NAME = DEV_AIRPODS
 
 const inputDevice = portAudio.getDevices().find(device => device.name === INPUT_DEVICE_NAME && device.maxInputChannels > 0)
@@ -16,7 +17,7 @@ var ai = new portAudio.AudioIO({
     inOptions: {
       channelCount: 2,
       sampleFormat: portAudio.SampleFormat16Bit,
-      sampleRate: 44100,
+      sampleRate: 16000,
       deviceId: inputDevice.id, // Use -1 or omit the deviceId to select the default device
       closeOnError: true // Close the stream if an audio error is detected, if set false then just log the error
 
@@ -24,7 +25,7 @@ var ai = new portAudio.AudioIO({
     outOptions: {
       channelCount: 2,
       sampleFormat: portAudio.SampleFormat16Bit,
-      sampleRate: 44100,
+      sampleRate: 16000,
       deviceId: outputDevice.id, // Use -1 or omit the deviceId to select the default device
       closeOnError: true // Close the stream if an audio error is detected, if set false then just log the error
     }

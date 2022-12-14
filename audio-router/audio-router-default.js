@@ -1,7 +1,11 @@
-// Inspired in https://github.com/Streampunk/naudiodon/issues/13#issuecomment-384928879
+/***
+ * it always routes the audio to the default output device
+ */
 
 var portAudio = require('naudiodon');
 var fs = require('fs');
+
+var { onChangeOutput } = require('./helper')
 
 const DEV_AIRPODS = 'AirPods Max de Matias'
 const DEV_BLACKHOLE = 'BlackHole 2ch'
@@ -15,42 +19,60 @@ const OUTPUT_DEVICE_NAME = DEV_AIRPODS
 const inputDevice = portAudio.getDevices().find(device => device.name === INPUT_DEVICE_NAME && device.maxInputChannels > 0)
 const outputDevice = portAudio.getDevices().find(device => device.name === OUTPUT_DEVICE_NAME && device.maxOutputChannels > 0)
 
-var ao = new portAudio.AudioIO({    
-  outOptions:   {
-    channelCount: 2,
-    sampleFormat: portAudio.SampleFormat16Bit,
-    sampleRate: 16000,
-    deviceId: -1
-  }
-});
+var ao = null
 
 var ai = new portAudio.AudioIO({    
   inOptions:   {
-    channelCount: 2,
+    channelCount: 1,
     sampleFormat: portAudio.SampleFormat16Bit,
     sampleRate: 16000,
-    deviceId: inputDevice.id
+    deviceId: inputDevice.id,
+    closeOnError: false
   }
 });
 
 
-
-// ai.pipe(ao); //  produces audio overflow
 
 /** INPUT events */
 ai.on("data", chunk => {
   //console.log(chunk)
-   ao.write(chunk) 
+  if (ao) {
+    ao.write(chunk) 
+  }
 });
-
 ai.start();
 
 
 /** Output events */
-ao.on("error", chunk => {
-  console.error("ERROR OUTPUT", chunk) 
-});
-ao.start();
+const interval = onChangeOutput((defaultDeviceId) => {
+
+  console.log('Changing default device', defaultDeviceId)
+
+  if (ao) {
+    ao = null
+  }
+
+
+ const deviceDefault =  portAudio.getDevices().find(device => device.id === defaultDeviceId && device.maxOutputChannels > 0)
+
+  console.log(deviceDefault, "DEFAULT DEVICE OUT")
+
+  ao = new portAudio.AudioIO({    
+    outOptions:   {
+      channelCount: 1,
+      sampleFormat: portAudio.SampleFormat16Bit,
+      sampleRate: 16000,
+      deviceId: defaultDeviceId,
+      closeOnError: false
+    }
+  });
+  
+  ao.on("error", chunk => {
+    console.error("ERROR OUTPUT", chunk) 
+  });
+  ao.start();
+})
+
 
 
 
