@@ -34,6 +34,8 @@ var ai = new portAudio.AudioIO({
 
 // var ws = fs.createWriteStream('rawAudio2.raw');
 
+console.log('xx', ai)
+
 // ai.pipe(ws);
 ai.start();
 
