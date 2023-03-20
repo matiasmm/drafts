@@ -1,28 +1,28 @@
+const { NextFederationPlugin } = require('@module-federation/nextjs-mf');
+
+
 const nextConfig = {
   reactStrictMode: true,
-  distDir: 'public/build',
+  // distDir: 'public/build',
   // webpack5: true,
   webpack: (config, options) => {
+    const { isServer } = options;
     config.plugins.push(
-      new options.webpack.container.ModuleFederationPlugin({
-        name: 'fe1',
-        filename: 'remoteEntry.js',
-        remoteType: 'var',
-        exposes: {
-          "./header": './src/components/Header',
+      new NextFederationPlugin({
+        name: 'next2',
+        remotes: {
+          next1: `fe1@http://localhost:3001/_next/static/${
+            isServer ? 'ssr' : 'chunks'
+          }/remoteEntry.js`,
         },
-        shared: [
-          { react: {
-            eager: true,
-            singleton: true,
-            requiredVersion: false,
-          }},
-          { "react-dom": {
-            eager: true,
-            singleton: true,
-            requiredVersion: false,
-          } },
-        ]
+        filename: 'static/chunks/remoteEntry.js',
+        exposes: {
+          './header': './src/components/Header',
+          // './checkout': './pages/checkout',
+        },
+        shared: {
+          // whatever else
+        },
       })
     );
     return config
@@ -30,3 +30,6 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+
+// require('@module-federation/nextjs-mf/src/include-defaults');
+

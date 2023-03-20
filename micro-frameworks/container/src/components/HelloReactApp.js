@@ -1,9 +1,11 @@
 import { mount } from 'helloReact/HelloReactApp'
+import { Header } from 'fe1/header'
 import React, { useRef, useEffect } from 'react'
 import { useHistory } from 'react-router-dom';
 
 
 export default () => {
+    console.log(Header)
     const ref = useRef(null);
     const history = useHistory();
 
@@ -12,5 +14,8 @@ export default () => {
         history.listen(onParentNavigate)
     }, [])
 
-    return <div ref={ref} />
+    return <div>
+        <Header />
+        <div ref={ref} />
+    </div>
 }

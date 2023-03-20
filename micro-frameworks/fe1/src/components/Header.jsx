@@ -6,5 +6,5 @@ export const Header = () => {
         style={{
             backgroundColor: 'red'
         }}
-    >xx</div>
+    >xx  MATIAS</div>
 }
